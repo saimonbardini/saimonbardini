@@ -9,13 +9,11 @@ async function fetchGitHubData() {
         query: `{
             user(login: "${USERNAME}") {
                 repositories(privacy: PUBLIC) { totalCount }
-                contributionsCollection { totalCommitContributions }
-                repositories(first: 100, ownerAffiliations: OWNER) {
-                    nodes {
-                        languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
-                            edges { size node { name color } }
-                        }
-                    }
+                contributionsCollection {
+                    totalCommitContributions
+                }
+                topLanguages: repositories(first: 100, ownerAffiliations: OWNER, orderBy: {field: UPDATED_AT, direction: DESC}) {
+                    nodes { languages(first: 5) { edges { size node { name color } } } }
                 }
             }
         }`
@@ -27,7 +25,7 @@ async function fetchGitHubData() {
             path: '/graphql',
             method: 'POST',
             headers: {
-                'Authorization': `bearer ${GITHUB_TOKEN}`,
+                'Authorization': `Bearer ${GITHUB_TOKEN}`,
                 'User-Agent': 'NodeJS',
                 'Content-Type': 'application/json',
                 'Content-Length': query.length
@@ -45,22 +43,63 @@ async function fetchGitHubData() {
     });
 }
 
-function generateSVG(repos, commits) {
+function processLanguages(data) {
+    const langs = {};
+    let totalSize = 0;
+    
+    if (!data.topLanguages || !data.topLanguages.nodes) return [];
+
+    data.topLanguages.nodes.forEach(repo => {
+        if (repo.languages && repo.languages.edges) {
+            repo.languages.edges.forEach(edge => {
+                langs[edge.node.name] = {
+                    size: (langs[edge.node.name]?.size || 0) + edge.size,
+                    color: edge.node.color
+                };
+                totalSize += edge.size;
+            });
+        }
+    });
+
+    return Object.entries(langs)
+        .sort((a, b) => b[1].size - a[1].size)
+        .slice(0, 5)
+        .map(([name, info]) => ({
+            name,
+            percent: parseFloat(((info.size / totalSize) * 100).toFixed(1)),
+            color: info.color
+        }));
+}
+
+function generateSVG(repos, commits, languages) {
+    const width = 450;
+    const height = 200;
+    
+    const langElements = languages.map((l, i) => `
+        <g transform="translate(20, ${100 + (i * 18)})">
+            <text x="0" y="10" fill="#c9d1d9" font-family="Segoe UI" font-size="11">${l.name}</text>
+            <rect x="80" y="2" width="280" height="7" rx="3.5" fill="#21262d"/>
+            <rect x="80" y="2" width="${(l.percent * 2.8)}" height="7" rx="3.5" fill="${l.color || '#58a6ff'}"/>
+            <text x="365" y="10" fill="#8b949e" font-family="Segoe UI" font-size="10">${l.percent}%</text>
+        </g>
+    `).join('');
+
     return `
-    <svg width="400" height="150" viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="400" height="150" rx="10" fill="#0d1117" stroke="#30363d"/>
-        <text x="20" y="35" font-family="Segoe UI" font-weight="bold" font-size="18" fill="#58a6ff">Status do Perfil</text>
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${width-2}" height="${height-2}" x="1" y="1" rx="10" fill="#0d1117" stroke="#30363d"/>
+        <text x="20" y="35" font-family="Segoe UI" font-weight="bold" font-size="18" fill="#58a6ff">Saimon Bardini - Stats</text>
         
         <g font-family="Segoe UI" font-size="14" fill="#c9d1d9">
             <text x="20" y="70">Repositórios Públicos:</text>
-            <text x="200" y="70" font-weight="bold" fill="#f0f6fc">${repos}</text>
+            <text x="180" y="65" font-weight="bold" fill="#f0f6fc">${repos}</text>
             
-            <text x="20" y="100">Commits (Este Ano):</text>
-            <text x="200" y="100" font-weight="bold" fill="#f0f6fc">${commits}</text>
+            <text x="210" y="65">Total Commits:</text>
+            <text x="320" y="65" font-weight="bold" fill="#f0f6fc">${commits}</text>
         </g>
         
-        <rect x="20" y="125" width="360" height="8" rx="4" fill="#21262d"/>
-        <rect x="20" y="125" width="280" height="8" rx="4" fill="#238636"/>
+        <line x1="20" y1="85" x2="${width-20}" y2="85" stroke="#30363d" />
+        
+        ${langElements}
     </svg>`;
 }
 
@@ -69,11 +108,25 @@ async function main() {
         if (!GITHUB_TOKEN) throw new Error("GH_TOKEN não configurado!");
         
         const result = await fetchGitHubData();
+
+        // Tratamento de erro detalhado
+        if (result && result.errors) {
+            console.error("❌ Erro na API do GitHub:", JSON.stringify(result.errors, null, 2));
+            process.exit(1);
+        }
+
+        if (!result.data || !result.data.user) {
+            console.error("❌ Resposta inesperada (verifique seu Token):", JSON.stringify(result, null, 2));
+            process.exit(1);
+        }
+
         const user = result.data.user;
         
+        const languages = processLanguages(user);
         const svg = generateSVG(
             user.repositories.totalCount,
-            user.contributionsCollection.totalCommitContributions
+            user.contributionsCollection.totalCommitContributions,
+            languages
         );
 
         if (!fs.existsSync('assets')) fs.mkdirSync('assets');
