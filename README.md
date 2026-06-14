@@ -25,3 +25,10 @@
   <a href="https://www.linkedin.com/in/saimonbardini/" title="LinkedIn">
   <img src="https://img.shields.io/badge/-Linkedin-0e76a8?style=flat-square&logo=Linkedin&logoColor=white" alt="LinkedIn"/></a>
 </p>
+
+<p>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./assets/stats.svg">
+    <img alt="Saimon Stats" src="./assets/stats.svg" width="100%">
+  </picture>
+</p>
