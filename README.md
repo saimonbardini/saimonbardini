@@ -29,6 +29,6 @@
 <p>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/stats.svg">
-    <img alt="Saimon Stats" src="./assets/stats.svg" width="100%">
+    <img alt="Saimon Stats" src="./assets/stats.svg" width="400">
   </picture>
 </p>

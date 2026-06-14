@@ -72,32 +72,32 @@ function processLanguages(data) {
 }
 
 function generateSVG(repos, commits, languages) {
-    const width = 450;
-    const height = 200;
+    const width = 400;
+    const height = 160;
     
     const langElements = languages.map((l, i) => `
-        <g transform="translate(20, ${100 + (i * 18)})">
-            <text x="0" y="10" fill="#c9d1d9" font-family="Segoe UI" font-size="11">${l.name}</text>
-            <rect x="80" y="2" width="280" height="7" rx="3.5" fill="#21262d"/>
-            <rect x="80" y="2" width="${(l.percent * 2.8)}" height="7" rx="3.5" fill="${l.color || '#58a6ff'}"/>
-            <text x="365" y="10" fill="#8b949e" font-family="Segoe UI" font-size="10">${l.percent}%</text>
+        <g transform="translate(20, ${82 + (i * 14)})">
+            <text x="0" y="9" fill="#c9d1d9" font-family="Segoe UI" font-size="10">${l.name}</text>
+            <rect x="75" y="2" width="250" height="6" rx="3" fill="#21262d"/>
+            <rect x="75" y="2" width="${(l.percent * 2.5)}" height="6" rx="3" fill="${l.color || '#58a6ff'}"/>
+            <text x="330" y="9" fill="#8b949e" font-family="Segoe UI" font-size="9">${l.percent}%</text>
         </g>
     `).join('');
 
     return `
-    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="${width-2}" height="${height-2}" x="1" y="1" rx="10" fill="#0d1117" stroke="#30363d"/>
-        <text x="20" y="35" font-family="Segoe UI" font-weight="bold" font-size="18" fill="#58a6ff">Saimon Bardini - Stats</text>
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <rect width="${width-2}" height="${height-2}" x="1" y="1" rx="8" fill="#0d1117" stroke="#30363d"/>
+        <text x="20" y="25" font-family="Segoe UI" font-weight="bold" font-size="16" fill="#58a6ff">Saimon Bardini - Stats</text>
         
-        <g font-family="Segoe UI" font-size="14" fill="#c9d1d9">
-            <text x="20" y="70">Repositórios Públicos:</text>
-            <text x="180" y="65" font-weight="bold" fill="#f0f6fc">${repos}</text>
+        <g font-family="Segoe UI" font-size="12" fill="#c9d1d9">
+            <text x="20" y="50">Repositórios:</text>
+            <text x="95" y="50" font-weight="bold" fill="#f0f6fc">${repos}</text>
             
-            <text x="210" y="65">Total Commits:</text>
-            <text x="320" y="65" font-weight="bold" fill="#f0f6fc">${commits}</text>
+            <text x="160" y="50">Total Commits:</text>
+            <text x="250" y="50" font-weight="bold" fill="#f0f6fc">${commits}</text>
         </g>
         
-        <line x1="20" y1="85" x2="${width-20}" y2="85" stroke="#30363d" />
+        <line x1="20" y1="65" x2="${width-20}" y2="65" stroke="#30363d" />
         
         ${langElements}
     </svg>`;
