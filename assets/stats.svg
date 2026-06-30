@@ -17,8 +17,8 @@
         <g transform="translate(20, 82)">
             <text x="0" y="9" fill="#c9d1d9" font-family="Segoe UI" font-size="10">PHP</text>
             <rect x="75" y="2" width="250" height="6" rx="3" fill="#21262d"/>
-            <rect x="75" y="2" width="178.25" height="6" rx="3" fill="#4F5D95"/>
-            <text x="330" y="9" fill="#8b949e" font-family="Segoe UI" font-size="9">71.3%</text>
+            <rect x="75" y="2" width="178.5" height="6" rx="3" fill="#4F5D95"/>
+            <text x="330" y="9" fill="#8b949e" font-family="Segoe UI" font-size="9">71.4%</text>
         </g>
     
         <g transform="translate(20, 96)">
