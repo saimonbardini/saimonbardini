@@ -3,7 +3,7 @@
 <img src="https://raw.githubusercontent.com/MicaelliMedeiros/micaellimedeiros/master/image/computer-illustration.png" alt="ilustração de um computador" min-width="400px" max-width="400px" width="400px" align="right">
 
 <p align="left"> 
-  <strong>Desenvolvimento web</strong> para empresas de pequeno e médio porte.<br>
+  <strong>Desenvolvimento web</strong> para empresas de pequeno porte.<br>
   Projetos como sites, intranets, páginas de gerenciamento de dados entre outros.
 </p>
 
